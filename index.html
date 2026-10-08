@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 01 - Scientific Calculator</title>
+
+  <!-- KaTeX: renders math formulas beautifully (like a textbook) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+  <!-- Floating math symbols are added here by JavaScript -->
+  <div id="bg" class="bg" aria-hidden="true"></div>
+
+  <div id="offline" class="offline hidden">
+    ⚠️ Math libraries failed to load. Connect to the internet and refresh.
+  </div>
+
+  <main class="calculator">
+    <div class="top-bar">
+      <!-- Hamburger button: opens the side menu -->
+      <button id="menuBtn" class="menu-btn" title="Menu" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- Tabs to switch between the modes -->
+      <nav class="tabs">
+        <button class="tab active" data-panel="scientific">Scientific</button>
+        <button class="tab" data-panel="calculus">Calculus ∫</button>
+        <button class="tab" data-panel="statistics">Statistics σ</button>
+      </nav>
+    </div>
+
+    <!-- ===================== SCIENTIFIC PANEL ===================== -->
+    <section id="scientific" class="panel active">
+      <div class="display">
+        <button class="tool mic-corner" data-tool="voice" data-target="scientific"
+                title="Speak a calculation, e.g. 'sine of 30 plus 5'">🎤</button>
+        <div id="history" class="history"></div>
+        <div id="expression" class="expression">0</div>
+        <div id="preview" class="preview"></div>
+      </div>
+
+      <!-- data-key tells JavaScript which button was pressed -->
+      <div class="buttons">
+        <button data-key="deg"   id="degBtn" class="btn mode">DEG</button>
+        <button data-key="inv"   id="invBtn" class="btn mode">INV</button>
+        <button data-key="left"  class="btn mode" title="Move cursor left">◀</button>
+        <button data-key="right" class="btn mode" title="Move cursor right">▶</button>
+        <button data-key="del"   class="btn danger">DEL</button>
+        <button data-key="clear" class="btn danger">AC</button>
+
+        <button data-key="sin"  class="btn function inv-able">sin</button>
+        <button data-key="cos"  class="btn function inv-able">cos</button>
+        <button data-key="tan"  class="btn function inv-able">tan</button>
+        <button data-key="("    class="btn function">(</button>
+        <button data-key=")"    class="btn function">)</button>
+        <button data-key="/"    class="btn operator">÷</button>
+
+        <button data-key="log"  class="btn function inv-able">log</button>
+        <button data-key="ln"   class="btn function inv-able">ln</button>
+        <button data-key="7" class="btn">7</button>
+        <button data-key="8" class="btn">8</button>
+        <button data-key="9" class="btn">9</button>
+        <button data-key="*" class="btn operator">×</button>
+
+        <button data-key="sqrt"   class="btn function inv-able">√</button>
+        <button data-key="square" class="btn function inv-able">x²</button>
+        <button data-key="4" class="btn">4</button>
+        <button data-key="5" class="btn">5</button>
+        <button data-key="6" class="btn">6</button>
+        <button data-key="-" class="btn operator">−</button>
+
+        <button data-key="pow"  class="btn function">xʸ</button>
+        <button data-key="fact" class="btn function">n!</button>
+        <button data-key="1" class="btn">1</button>
+        <button data-key="2" class="btn">2</button>
+        <button data-key="3" class="btn">3</button>
+        <button data-key="+" class="btn operator">+</button>
+
+        <button data-key="pi"  class="btn function">π</button>
+        <button data-key="e"   class="btn function">e</button>
+        <button data-key="0"   class="btn">0</button>
+        <button data-key="."   class="btn">.</button>
+        <button data-key="ans" class="btn function">Ans</button>
+        <button data-key="equals" class="btn equals">=</button>
+
+        <button data-key="abs"        class="btn function">|x|</button>
+        <button data-key="reciprocal" class="btn function">1/x</button>
+        <button data-key="mod"        class="btn function">mod</button>
+        <button data-key="%"          class="btn function">%</button>
+        <button data-key="exp"        class="btn function">EXP</button>
+      </div>
+    </section>
+
+    <!-- ===================== CALCULUS PANEL ===================== -->
+    <section id="calculus" class="panel">
+      <div class="label-row">
+        <label class="field-label" for="fnInput">f(x) =</label>
+        <div class="input-tools">
+          <button class="tool" data-tool="voice" data-target="calculus"
+                  title="Speak, e.g. 'derivative of x squared times sine x'">🎤</button>
+          <button class="tool" data-tool="image" data-target="calculus"
+                  title="Read a function from an image (or paste one with Ctrl+V)">📷</button>
+          <button class="tool" data-tool="draw" data-target="calculus"
+                  title="Write the function by hand">✍️</button>
+        </div>
+      </div>
+      <input id="fnInput" class="fn-input" type="text" spellcheck="false"
+             autocomplete="off" placeholder="e.g.  x^2 * sin(x)">
+      <div id="fnPreview" class="fn-preview"></div>
+
+      <!-- Quick-insert chips -->
+      <div class="chips">
+        <button class="chip" data-insert="sin(">sin</button>
+        <button class="chip" data-insert="cos(">cos</button>
+        <button class="chip" data-insert="tan(">tan</button>
+        <button class="chip" data-insert="ln(">ln</button>
+        <button class="chip" data-insert="sqrt(">√</button>
+        <button class="chip" data-insert="e^(">eˣ</button>
+        <button class="chip" data-insert="^">^</button>
+        <button class="chip" data-insert="pi">π</button>
+      </div>
+
+      <div class="calc-row">
+        <button id="diffBtn" class="action diff">d/dx  Derivative</button>
+        <select id="order" class="order" title="Derivative order">
+          <option value="1">1st</option>
+          <option value="2">2nd</option>
+          <option value="3">3rd</option>
+        </select>
+      </div>
+
+      <button id="intBtn" class="action int">∫ dx  Indefinite Integral</button>
+
+      <div class="calc-row">
+        <input id="lowerInput" class="limit" type="text" placeholder="a = 0" value="0">
+        <input id="upperInput" class="limit" type="text" placeholder="b = 1" value="1">
+        <button id="defIntBtn" class="action defint">∫ₐᵇ Definite</button>
+      </div>
+
+      <div id="calcOutput" class="calc-output">
+        <div id="calcResult" class="calc-result"></div>
+        <div id="calcNote" class="calc-note">Type a function of <b>x</b>, then pick an operation.</div>
+      </div>
+
+      <div class="examples">
+        <span>Try:</span>
+        <button class="example">x^3 + 2x</button>
+        <button class="example">sin(x) * cos(x)</button>
+        <button class="example">x * e^x</button>
+        <button class="example">ln(x)</button>
+        <button class="example">1 / (1 + x^2)</button>
+      </div>
+    </section>
+
+    <!-- ===================== STATISTICS PANEL ===================== -->
+    <section id="statistics" class="panel">
+      <div class="label-row">
+        <select id="statsMode" class="stats-mode">
+          <option value="list">Single list of numbers</option>
+          <option value="freq">Values + frequencies</option>
+          <option value="paired">Paired data (x, y)</option>
+        </select>
+        <div class="input-tools">
+          <button class="tool" data-tool="voice" data-target="stats"
+                  title="Speak numbers, e.g. '12, 15, 18, 20'">🎤</button>
+          <button class="tool" data-tool="image" data-target="stats"
+                  title="Read numbers from an image (or paste one with Ctrl+V)">📷</button>
+          <button class="tool" data-tool="draw" data-target="stats"
+                  title="Write numbers by hand">✍️</button>
+        </div>
+      </div>
+
+      <div class="stats-inputs">
+        <div class="stats-field">
+          <label id="xLabel" class="field-label" for="xData">Data</label>
+          <textarea id="xData" class="stats-data" spellcheck="false"
+                    placeholder="12, 15, 18, 20, 15"></textarea>
+        </div>
+        <div id="yField" class="stats-field hidden">
+          <label id="yLabel" class="field-label" for="yData">Frequencies</label>
+          <textarea id="yData" class="stats-data" spellcheck="false"></textarea>
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <span class="stats-hint">Separate with commas, spaces or new lines · Ctrl+V pastes a screenshot</span>
+        <button id="statsExample" class="chip">Example</button>
+        <button id="statsClear" class="chip">Clear</button>
+      </div>
+
+      <div id="statsResults" class="stats-results"></div>
+      <div id="statsSorted" class="stats-sorted"></div>
+    </section>
+
+  </main>
+
+  <!-- ===================== SIDE MENU (slides in from the left) ===================== -->
+  <div id="drawerOverlay" class="drawer-overlay"></div>
+  <aside id="drawer" class="drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <h3>Account</h3>
+      <button id="drawerClose" class="modal-x" title="Close menu">✕</button>
+    </div>
+
+    <section id="account">
+      <div id="setupNotice" class="setup-notice hidden">
+        <b>⚙️ Sign-in isn't set up yet.</b>
+        Create a free Firebase project, then paste its config into
+        <code>firebase-config.js</code>. The steps are written at the top of that file.
+      </div>
+
+      <!-- Shown when signed out -->
+      <div id="signedOut" class="auth-box">
+        <div class="auth-icon">👤</div>
+        <h2>Welcome!</h2>
+        <p class="auth-sub">Sign in to make this calculator yours.</p>
+
+        <button id="googleBtn" class="social google" disabled>
+          <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true">
+            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/>
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+            <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
+            <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/>
+          </svg>
+          Continue with Google
+        </button>
+
+        <button id="facebookBtn" class="social facebook" disabled>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path fill="#fff" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/>
+          </svg>
+          Continue with Facebook
+        </button>
+
+        <p id="authNote" class="auth-note">
+          Loading sign-in… If this message doesn't go away, open the page through a web
+          server (for example <code>http://localhost:5500</code>), not by double-clicking the file.
+        </p>
+        <p id="authError" class="auth-error"></p>
+      </div>
+
+      <!-- Shown when signed in -->
+      <div id="signedIn" class="auth-box hidden">
+        <div class="avatar-wrap">
+          <img id="userPhoto" class="avatar" alt="Profile photo" referrerpolicy="no-referrer">
+          <div id="userInitials" class="avatar initials hidden"></div>
+        </div>
+        <h2 id="userName"></h2>
+        <p id="userEmail" class="auth-sub"></p>
+        <span id="userProvider" class="provider-badge"></span>
+        <p id="userSince" class="auth-note"></p>
+        <button id="signOutBtn" class="action defint small">Sign out</button>
+      </div>
+    </section>
+  </aside>
+
+  <!-- ===================== INPUT HELPER POPUP (draw / image) ===================== -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="modalTitle">Write by hand</h3>
+        <button id="modalClose" class="modal-x" title="Close">✕</button>
+      </div>
+
+      <canvas id="drawCanvas" class="draw-canvas" width="1000" height="360"></canvas>
+      <img id="imagePreview" class="image-preview hidden" alt="Image to read">
+
+      <div id="drawTools" class="modal-row">
+        <button id="undoStroke" class="chip">↶ Undo</button>
+        <button id="clearCanvas" class="chip">Clear</button>
+        <span class="modal-tip">Write large and clearly on one line</span>
+        <button id="recognizeBtn" class="action diff small">Recognize</button>
+      </div>
+
+      <div id="ocrStatus" class="ocr-status"></div>
+
+      <label class="field-label" for="ocrText">Recognized — fix any mistakes, then insert:</label>
+      <input id="ocrText" class="fn-input" type="text" spellcheck="false" autocomplete="off">
+
+      <div class="modal-row end">
+        <button id="modalCancel" class="chip">Cancel</button>
+        <button id="modalInsert" class="action int small">Insert</button>
+      </div>
+    </div>
+  </div>
+
+  <input id="imageInput" type="file" accept="image/*" hidden>
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@13.2.0/lib/browser/math.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <!-- Tesseract.js: reads text from images (OCR) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+
+  <script src="script.js?v=2"></script>
+  <script src="stats.js?v=2"></script>
+  <script src="input-tools.js?v=2"></script>
+  <!-- type="module" lets this file use import (needed for Firebase) -->
+  <script type="module" src="auth.js?v=2"></script>
+</body>
+</html>
