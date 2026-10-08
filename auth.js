@@ -60,7 +60,10 @@ async function signInWith(provider, button) {
     await signInWithPopup(auth, provider);
   } catch (err) {
     // Some browsers block popups -> use a full-page redirect instead
-    if (err.code === "auth/popup-blocked") return signInWithRedirect(auth, provider);
+    if (err.code === "auth/popup-blocked") {
+      await signInWithRedirect(auth, provider).catch(showError);
+      return;
+    }
     showError(err);
   } finally {
     button.disabled = false;
@@ -100,6 +103,7 @@ onAuthStateChanged(auth, (user) => {
 
   const name = user.displayName || "Math lover";
   const providerId = user.providerData[0]?.providerId;
+  window.suggestName?.(user.displayName);   // fill "Your name" if it's empty
   $("userName").textContent = name;
   $("userEmail").textContent = user.email || "No email shared";
   $("userProvider").textContent = "Signed in with " + (PROVIDER_NAMES[providerId] || providerId);

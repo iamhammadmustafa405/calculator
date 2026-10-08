@@ -19,22 +19,20 @@ const SYMBOLS = [
   "tan θ", "log", "dy/dx", "f(x)", "lim", "n!", "a²+b²=c²", "E=mc²", "∫f(x)dx",
   "e^(iπ)+1=0", "√2", "x⁻¹",
 ];
-const SYMBOL_COLORS = ["#679fff", "#ff4356", "#1dd1a1", "#ffd166", "#c49bff", "#ffffff"];
-
 function random(min, max) {
   return min + Math.random() * (max - min);
 }
 
+// Symbols use one soft theme colour (set in style.css), so the background stays calm
 function createBackground() {
   const bg = document.getElementById("bg");
-  for (let i = 0; i < 45; i++) {
+  for (let i = 0; i < 30; i++) {
     const s = document.createElement("span");
-    const duration = random(18, 42);
+    const duration = random(30, 60);
     s.className = "symbol";
     s.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
     s.style.left = random(-5, 100) + "%";
-    s.style.fontSize = random(16, 58) + "px";
-    s.style.color = SYMBOL_COLORS[Math.floor(Math.random() * SYMBOL_COLORS.length)];
+    s.style.fontSize = random(18, 52) + "px";
     s.style.animationDuration = duration + "s";
     s.style.animationDelay = -random(0, duration) + "s"; // negative = already mid-flight
     s.style.setProperty("--drift", random(-120, 120) + "px");
@@ -201,6 +199,32 @@ function render() {
   }
 }
 
+// History list (right side on wide screens). Click an item to reuse its answer.
+const historyList = document.getElementById("historyList");
+
+function addToHistory(shown, text, value) {
+  historyList.querySelector(".history-empty")?.remove();
+  const item = document.createElement("button");
+  item.className = "history-item";
+  item.title = "Click to use this answer";
+  item.innerHTML = `<span class="history-q"></span><span class="history-a"></span>`;
+  item.querySelector(".history-q").textContent = shown + " =";
+  item.querySelector(".history-a").textContent = text;
+  item.addEventListener("click", () => {
+    ans = value;
+    tokens = [{ v: "Ans", d: text }];
+    cursor = tokens.length;
+    justEvaluated = true;
+    render();
+  });
+  historyList.prepend(item);                                        // newest on top
+  while (historyList.children.length > 30) historyList.lastChild.remove();
+}
+
+document.getElementById("clearHistory").addEventListener("click", () => {
+  historyList.innerHTML = `<p class="history-empty">Your calculations will appear here.</p>`;
+});
+
 function equals() {
   if (!tokens.length) return;
   const shown = tokens.map((t) => t.d).join("");
@@ -211,6 +235,7 @@ function equals() {
     historyEl.textContent = shown + " =";
     ans = r;
     tokens = [{ v: "Ans", d: text }]; // result can be used in the next calculation
+    addToHistory(shown, text, r);
   } catch {
     historyEl.textContent = shown;
     tokens = [{ v: "", d: "Error" }];
@@ -512,7 +537,7 @@ fnInput.addEventListener("keydown", (e) => {
   }
 });
 
-document.querySelectorAll(".chip").forEach((chip) => {
+document.querySelectorAll(".chip[data-insert]").forEach((chip) => {
   chip.addEventListener("click", () => insertAtCursor(chip.dataset.insert));
 });
 
