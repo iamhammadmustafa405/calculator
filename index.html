@@ -15,7 +15,7 @@
 
   <!-- KaTeX: renders math formulas beautifully (like a textbook) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
   <!-- Faint floating math symbols are added here by JavaScript -->
@@ -39,6 +39,7 @@
       <button class="tab active" data-panel="scientific">Scientific</button>
       <button class="tab" data-panel="calculus">Calculus ∫</button>
       <button class="tab" data-panel="statistics">Statistics σ</button>
+      <button class="tab" data-panel="graph">Graph 📈</button>
     </nav>
 
     <div id="greeting" class="greeting"></div>
@@ -231,6 +232,42 @@
       </div>
     </section>
 
+    <!-- ===================== GRAPH PANEL ===================== -->
+    <section id="graph" class="panel">
+      <div class="pane main-pane">
+        <div id="graphWrap" class="graph-wrap">
+          <canvas id="graphCanvas" class="graph-canvas"></canvas>
+          <div id="graphReadout" class="graph-readout hidden"></div>
+          <div class="graph-zoom">
+            <button id="zoomIn" title="Zoom in">＋</button>
+            <button id="zoomOut" title="Zoom out">－</button>
+            <button id="zoomReset" title="Reset view">⟲</button>
+          </div>
+        </div>
+        <p class="graph-hint">Drag to move · Scroll to zoom · Hover to read values</p>
+      </div>
+
+      <div class="pane side-pane">
+        <div class="pane-head">
+          <h3>Functions</h3>
+          <button id="graphAdd" class="chip">＋ Add</button>
+        </div>
+        <div id="graphList" class="graph-list"></div>
+
+        <div class="examples">
+          <span>Try:</span>
+          <button class="graph-example">x^2 - 4</button>
+          <button class="graph-example">sin(x)</button>
+          <button class="graph-example">cos(x)</button>
+          <button class="graph-example">tan(x)</button>
+          <button class="graph-example">1 / x</button>
+          <button class="graph-example">sqrt(x)</button>
+          <button class="graph-example">e^(-x^2)</button>
+          <button class="graph-example">x^3 - 3x</button>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ===================== SIDE MENU (slides in from the left) ===================== -->
@@ -362,11 +399,12 @@
   <!-- Tesseract.js: reads text from images (OCR) -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 
-  <script src="script.js?v=4"></script>
-  <script src="stats.js?v=4"></script>
-  <script src="input-tools.js?v=4"></script>
-  <script src="settings.js?v=4"></script>
+  <script src="script.js?v=5"></script>
+  <script src="stats.js?v=5"></script>
+  <script src="input-tools.js?v=5"></script>
+  <script src="settings.js?v=5"></script>
+  <script src="graph.js?v=5"></script>
   <!-- type="module" lets this file use import (needed for Firebase) -->
-  <script type="module" src="auth.js?v=4"></script>
+  <script type="module" src="auth.js?v=5"></script>
 </body>
 </html>

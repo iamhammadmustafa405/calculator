@@ -508,7 +508,8 @@ body {
   color: var(--muted);
 }
 
-.example {
+.example,
+.graph-example {
   padding: 5px 10px;
   border-radius: 8px;
   border: 1px dashed var(--border);
@@ -518,7 +519,8 @@ body {
   font-size: 13px;
   cursor: pointer;
 }
-.example:hover { border-color: var(--accent); }
+.example:hover,
+.graph-example:hover { border-color: var(--accent); }
 
 /* ===================== Input tools (🎤 📷 ✍️) ===================== */
 .label-row {
@@ -914,6 +916,113 @@ body.menu-open .drawer-overlay { opacity: 1; pointer-events: auto; }
 }
 .toast.error { border-color: var(--operator); color: var(--error-text); }
 
+/* ===================== Graph panel ===================== */
+.graph-wrap {
+  position: relative;
+  height: 520px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--raised);
+}
+
+.graph-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;   /* let fingers drag the graph instead of scrolling the page */
+}
+.graph-canvas.dragging { cursor: grabbing; }
+
+.graph-zoom {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.graph-zoom button {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+}
+.graph-zoom button:hover { background: var(--btn-hover); }
+
+.graph-readout {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-family: Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  pointer-events: none;   /* don't block dragging */
+}
+
+.graph-hint {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.graph-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.graph-row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.graph-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.graph-y {
+  color: var(--muted);
+  font-family: Consolas, monospace;
+}
+
+.graph-input { padding: 10px 12px; font-size: 16px; }
+
+.graph-remove {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  cursor: pointer;
+}
+
+.graph-error {
+  grid-column: 3 / -1;
+  color: var(--error-text);
+  font-size: 13px;
+}
+.graph-error:empty { display: none; }
+
+#graphAdd:disabled { opacity: 0.5; cursor: not-allowed; }
+
 /* ===================== Smaller screens ===================== */
 /* Tablets: one column (main area on top, side area below) */
 @media (max-width: 960px) {
@@ -934,4 +1043,5 @@ body.menu-open .drawer-overlay { opacity: 1; pointer-events: auto; }
   .expression { font-size: 30px; }
   .stats-inputs { flex-direction: column; }
   .stats-hint { display: none; }
+  .graph-wrap { height: 360px; }
 }
