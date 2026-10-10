@@ -338,7 +338,8 @@ const calcNote = document.getElementById("calcNote");
 
 // Clean up what the user typed into a form both libraries understand.
 // Returns { text, node } where node is the math.js expression tree.
-function parseFunction(input) {
+// vars: the letters allowed as variables (the Live graph tab also allows t for time)
+function parseFunction(input, vars = ["x"]) {
   const raw = input.trim()
     .replace(/π/g, "pi")
     .replace(/√/g, "sqrt")
@@ -352,11 +353,12 @@ function parseFunction(input) {
     throw new Error("That doesn't look like a valid function. Check the brackets and operators.");
   }
 
-  // Only allow the variable x (plus the constants e and pi)
+  // Only allow the variables (plus the constants e and pi)
   node.traverse((n, path, parent) => {
     const isFunctionName = parent && parent.isFunctionNode && path === "fn";
-    if (n.isSymbolNode && !isFunctionName && !["x", "e", "pi"].includes(n.name)) {
-      throw new Error(`Unknown symbol "${n.name}". Use x as the variable.`);
+    if (n.isSymbolNode && !isFunctionName && ![...vars, "e", "pi"].includes(n.name)) {
+      const use = vars.length > 1 ? vars.join(" and ") + " as the variables" : vars[0] + " as the variable";
+      throw new Error(`Unknown symbol "${n.name}". Use ${use}.`);
     }
   });
 

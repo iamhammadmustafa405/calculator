@@ -1,21 +1,29 @@
 // =====================================================================
-// GRAPH: draw functions y = f(x) on a grid you can drag and zoom
+// GRAPH + LIVE GRAPH: draw functions y = f(x) on a grid you can drag and zoom
 //
 // How it works: for every pixel across the canvas we work out x,
 // calculate y = f(x) with math.js, and join the points with a line.
 // "view" remembers which part of the graph is on screen.
+//
+// The same code runs two tabs:
+//   Graph tab -> functions of x
+//   Live tab  -> functions of x and t (time). t keeps growing, and the
+//                graph is redrawn about 60 times a second, so it moves.
 // =====================================================================
-(() => {
-  const wrap = document.getElementById("graphWrap");
-  const canvas = document.getElementById("graphCanvas");
+function setupGraph(panel, { live = false } = {}) {
+  const $ = (selector) => panel.querySelector(selector);
+  const wrap = $(".graph-wrap");
+  const canvas = $(".graph-canvas");
   const ctx = canvas.getContext("2d");
-  const listEl = document.getElementById("graphList");
-  const addBtn = document.getElementById("graphAdd");
-  const readout = document.getElementById("graphReadout");
+  const listEl = $(".graph-list");
+  const addBtn = $(".graph-add");
+  const readout = $(".graph-readout");
 
   const COLORS = ["#ff4d5e", "#4da3ff", "#12b886", "#ffb020", "#b06cff", "#ff7ac6"];
   const MAX_FUNCTIONS = COLORS.length;
-  const STORAGE_KEY = "calc-graphs";
+  const VARS = live ? ["x", "t"] : ["x"];
+  const STORAGE_KEY = live ? "calc-live-graphs" : "calc-graphs";
+  const START_FUNCTIONS = live ? ["sin(x - t)"] : ["sin(x)"];
 
   let width = 0;          // canvas size in CSS pixels
   let height = 0;
@@ -23,6 +31,7 @@
   let fns = [];           // [{ text, color, compiled, error }]
   let hoverX = null;      // mouse position (pixels) for the trace line
   let drag = null;        // set while the user is dragging the graph
+  let t = 0;              // time in seconds (Live tab only)
 
   // ---------- Converting between graph units and screen pixels ----------
   const toPx = (x) => width / 2 + (x - view.cx) * view.scale;
@@ -58,7 +67,7 @@
     const text = fn.text.replace(/^\s*(y|f\s*\(\s*x\s*\))\s*=/i, "");   // allow "y = ..."
     if (!text.trim()) return;
     try {
-      fn.compiled = parseFunction(text).node.compile();   // parseFunction is in script.js
+      fn.compiled = parseFunction(text, VARS).node.compile();   // parseFunction is in script.js
     } catch (err) {
       fn.error = err.message;
     }
@@ -66,7 +75,7 @@
 
   function valueAt(fn, x) {
     try {
-      const y = fn.compiled.evaluate({ x });
+      const y = fn.compiled.evaluate({ x, t });
       return typeof y === "number" ? y : NaN;   // e.g. √(−1) is not a real number
     } catch {
       return NaN;
@@ -212,6 +221,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (!view) resetView();
     draw();
+    if (live) startAnimation();   // the tab just became visible
   }).observe(wrap);
 
   // Redraw when the theme changes, so the grid uses the new colours
@@ -265,9 +275,51 @@
     zoomAt(e.clientX - rect.left, e.clientY - rect.top, e.deltaY < 0 ? 1.2 : 1 / 1.2);
   }, { passive: false });
 
-  document.getElementById("zoomIn").addEventListener("click", () => zoomAt(width / 2, height / 2, 1.5));
-  document.getElementById("zoomOut").addEventListener("click", () => zoomAt(width / 2, height / 2, 1 / 1.5));
-  document.getElementById("zoomReset").addEventListener("click", () => { resetView(); draw(); });
+  $(".zoom-in").addEventListener("click", () => zoomAt(width / 2, height / 2, 1.5));
+  $(".zoom-out").addEventListener("click", () => zoomAt(width / 2, height / 2, 1 / 1.5));
+  $(".zoom-reset").addEventListener("click", () => { resetView(); draw(); });
+
+  // ---------- Animation (Live tab only) ----------
+  let playing = live;
+  let running = false;    // is the animation loop going right now?
+  let lastFrame = 0;
+
+  function startAnimation() {
+    if (!playing || running) return;
+    running = true;
+    lastFrame = performance.now();
+    requestAnimationFrame(frame);
+  }
+
+  function frame(now) {
+    // Stop when paused or when the tab is hidden (saves battery)
+    if (!playing || !wrap.clientWidth) { running = false; return; }
+    const speed = Number($(".live-speed").value);
+    // At most 0.1 s per frame, so t doesn't jump after the browser tab was in the background
+    t += Math.min((now - lastFrame) / 1000, 0.1) * speed;
+    lastFrame = now;
+    $(".live-time").textContent = "t = " + t.toFixed(2) + " s";
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  if (live) {
+    const playBtn = $(".live-play");
+    const showPlayState = () => {
+      playBtn.textContent = playing ? "⏸ Pause" : "▶ Play";
+    };
+    playBtn.addEventListener("click", () => {
+      playing = !playing;
+      showPlayState();
+      startAnimation();
+    });
+    $(".live-restart").addEventListener("click", () => {
+      t = 0;
+      $(".live-time").textContent = "t = 0.00 s";
+      draw();
+    });
+    showPlayState();
+  }
 
   // ---------- The list of functions (side pane) ----------
   function save() {
@@ -279,7 +331,7 @@
   function load() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (Array.isArray(saved)) return saved.filter((t) => typeof t === "string");
+      if (Array.isArray(saved)) return saved.filter((text) => typeof text === "string");
     } catch {}
     return null;
   }
@@ -312,7 +364,7 @@
       input.type = "text";
       input.spellcheck = false;
       input.autocomplete = "off";
-      input.placeholder = "e.g. x^2 - 4";
+      input.placeholder = live ? "e.g. sin(x - t)" : "e.g. x^2 - 4";
       input.value = fn.text;
 
       const remove = document.createElement("button");
@@ -351,12 +403,13 @@
     if (fn) { save(); renderList(fn); }
   });
 
-  // "Try:" buttons fill the last empty box, or add a new one
-  document.querySelectorAll(".graph-example").forEach((btn) => {
+  // "Try:" buttons fill the last empty box, or add a new one.
+  // The function comes from data-fn, or from the button's text.
+  panel.querySelectorAll(".graph-example").forEach((btn) => {
     btn.addEventListener("click", () => {
       let fn = fns.find((f) => !f.text.trim()) || addFunction();
       if (!fn) fn = fns[fns.length - 1];   // list is full: replace the last one
-      fn.text = btn.textContent;
+      fn.text = btn.dataset.fn || btn.textContent;
       compile(fn);
       save();
       renderList();
@@ -364,7 +417,10 @@
     });
   });
 
-  (load() || ["sin(x)"]).slice(0, MAX_FUNCTIONS).forEach((text) => addFunction(text));
+  (load() || START_FUNCTIONS).slice(0, MAX_FUNCTIONS).forEach((text) => addFunction(text));
   if (!fns.length) addFunction();
   renderList();
-})();
+}
+
+setupGraph(document.getElementById("graph"));
+setupGraph(document.getElementById("live"), { live: true });

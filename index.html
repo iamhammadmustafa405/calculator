@@ -15,7 +15,7 @@
 
   <!-- KaTeX: renders math formulas beautifully (like a textbook) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
   <!-- Faint floating math symbols are added here by JavaScript -->
@@ -40,6 +40,7 @@
       <button class="tab" data-panel="calculus">Calculus ∫</button>
       <button class="tab" data-panel="statistics">Statistics σ</button>
       <button class="tab" data-panel="graph">Graph 📈</button>
+      <button class="tab" data-panel="live">Live 〰️</button>
     </nav>
 
     <div id="greeting" class="greeting"></div>
@@ -235,13 +236,13 @@
     <!-- ===================== GRAPH PANEL ===================== -->
     <section id="graph" class="panel">
       <div class="pane main-pane">
-        <div id="graphWrap" class="graph-wrap">
-          <canvas id="graphCanvas" class="graph-canvas"></canvas>
-          <div id="graphReadout" class="graph-readout hidden"></div>
+        <div class="graph-wrap">
+          <canvas class="graph-canvas"></canvas>
+          <div class="graph-readout hidden"></div>
           <div class="graph-zoom">
-            <button id="zoomIn" title="Zoom in">＋</button>
-            <button id="zoomOut" title="Zoom out">－</button>
-            <button id="zoomReset" title="Reset view">⟲</button>
+            <button class="zoom-in" title="Zoom in">＋</button>
+            <button class="zoom-out" title="Zoom out">－</button>
+            <button class="zoom-reset" title="Reset view">⟲</button>
           </div>
         </div>
         <p class="graph-hint">Drag to move · Scroll to zoom · Hover to read values</p>
@@ -250,9 +251,9 @@
       <div class="pane side-pane">
         <div class="pane-head">
           <h3>Functions</h3>
-          <button id="graphAdd" class="chip">＋ Add</button>
+          <button class="chip graph-add">＋ Add</button>
         </div>
-        <div id="graphList" class="graph-list"></div>
+        <div class="graph-list"></div>
 
         <div class="examples">
           <span>Try:</span>
@@ -264,6 +265,58 @@
           <button class="graph-example">sqrt(x)</button>
           <button class="graph-example">e^(-x^2)</button>
           <button class="graph-example">x^3 - 3x</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== LIVE GRAPH PANEL (animated) ===================== -->
+    <!-- Same as the Graph panel, but functions can use t (time), so they move -->
+    <section id="live" class="panel">
+      <div class="pane main-pane">
+        <div class="graph-wrap">
+          <canvas class="graph-canvas"></canvas>
+          <div class="graph-readout hidden"></div>
+          <div class="graph-zoom">
+            <button class="zoom-in" title="Zoom in">＋</button>
+            <button class="zoom-out" title="Zoom out">－</button>
+            <button class="zoom-reset" title="Reset view">⟲</button>
+          </div>
+        </div>
+
+        <div class="live-controls">
+          <button class="action diff small live-play">⏸ Pause</button>
+          <button class="chip live-restart" title="Start time again from 0">⏮ Restart</button>
+          <label class="live-speed-label">
+            Speed
+            <select class="order live-speed">
+              <option value="0.25">0.25×</option>
+              <option value="0.5">0.5×</option>
+              <option value="1" selected>1×</option>
+              <option value="2">2×</option>
+              <option value="4">4×</option>
+            </select>
+          </label>
+          <span class="live-time">t = 0.00 s</span>
+        </div>
+      </div>
+
+      <div class="pane side-pane">
+        <div class="pane-head">
+          <h3>Moving functions</h3>
+          <button class="chip graph-add">＋ Add</button>
+        </div>
+        <p class="live-tip">Use <b>x</b> and <b>t</b> (time in seconds). Anything with t moves!</p>
+        <div class="graph-list"></div>
+
+        <div class="examples">
+          <span>Try:</span>
+          <button class="graph-example" data-fn="sin(x - t)">〰️ Moving wave</button>
+          <button class="graph-example" data-fn="sin(x) * cos(t)">🎸 Standing wave</button>
+          <button class="graph-example" data-fn="sin(x - t) + sin(1.2x - 1.4t)">🔊 Beats</button>
+          <button class="graph-example" data-fn="3 * e^(-(x - 8 sin(t))^2)">🌊 Bouncing pulse</button>
+          <button class="graph-example" data-fn="x^2 * sin(t) / 4">🫁 Breathing parabola</button>
+          <button class="graph-example" data-fn="e^(-x^2 / 20) * cos(3x - 2t) * 3">📡 Wave packet</button>
+          <button class="graph-example" data-fn="2 * sin(x) + sin(3x - 2t)">🎵 Two waves</button>
         </div>
       </div>
     </section>
@@ -399,12 +452,12 @@
   <!-- Tesseract.js: reads text from images (OCR) -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 
-  <script src="script.js?v=5"></script>
-  <script src="stats.js?v=5"></script>
-  <script src="input-tools.js?v=5"></script>
-  <script src="settings.js?v=5"></script>
-  <script src="graph.js?v=5"></script>
+  <script src="script.js?v=6"></script>
+  <script src="stats.js?v=6"></script>
+  <script src="input-tools.js?v=6"></script>
+  <script src="settings.js?v=6"></script>
+  <script src="graph.js?v=6"></script>
   <!-- type="module" lets this file use import (needed for Firebase) -->
-  <script type="module" src="auth.js?v=5"></script>
+  <script type="module" src="auth.js?v=6"></script>
 </body>
 </html>

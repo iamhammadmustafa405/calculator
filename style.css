@@ -1021,7 +1021,40 @@ body.menu-open .drawer-overlay { opacity: 1; pointer-events: auto; }
 }
 .graph-error:empty { display: none; }
 
-#graphAdd:disabled { opacity: 0.5; cursor: not-allowed; }
+.graph-add:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ===================== Live graph controls ===================== */
+.live-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.live-play { min-width: 110px; }
+
+.live-speed-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.live-speed { height: 36px; }
+
+.live-time {
+  margin-left: auto;
+  color: var(--fn-text);
+  font-family: Consolas, monospace;
+  font-size: 15px;
+}
+
+.live-tip {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
 
 /* ===================== Smaller screens ===================== */
 /* Tablets: one column (main area on top, side area below) */
@@ -1034,7 +1067,8 @@ body.menu-open .drawer-overlay { opacity: 1; pointer-events: auto; }
 @media (max-width: 600px) {
   .app-header { flex-wrap: wrap; padding: 10px 16px; gap: 10px; }
   .tabs { order: 3; width: 100%; }        /* tabs move to their own row */
-  .tab { flex: 1; padding: 9px 4px; font-size: 13px; }
+  .tabs { overflow-x: auto; }               /* 5 tabs: swipe sideways if they don't fit */
+  .tab { flex: 1 0 auto; padding: 9px 10px; font-size: 13px; white-space: nowrap; }
   .workspace { padding: 16px; }
   .pane { padding: 14px; }
   .buttons { gap: 7px; }
