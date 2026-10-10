@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mathemagic Calculator</title>
+  <!-- Logo in the browser tab, and on a phone's home screen -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
   <!-- Apply the saved theme straight away, so the page doesn't flash the wrong colours -->
   <script>
@@ -15,7 +18,7 @@
 
   <!-- KaTeX: renders math formulas beautifully (like a textbook) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
   <!-- Faint floating math symbols are added here by JavaScript -->
@@ -32,7 +35,10 @@
       <span></span><span></span><span></span>
     </button>
 
-    <div class="brand">∑ <b>Mathemagic</b></div>
+    <div class="brand">
+      <img class="brand-logo" src="images/logo-mark.png" alt="Mathemagic logo">
+      <b>Mathe<span class="brand-magic">magic</span></b>
+    </div>
 
     <!-- Tabs to switch between the modes -->
     <nav class="tabs">
@@ -452,12 +458,12 @@
   <!-- Tesseract.js: reads text from images (OCR) -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 
-  <script src="script.js?v=6"></script>
-  <script src="stats.js?v=6"></script>
-  <script src="input-tools.js?v=6"></script>
-  <script src="settings.js?v=6"></script>
-  <script src="graph.js?v=6"></script>
+  <script src="script.js?v=7"></script>
+  <script src="stats.js?v=7"></script>
+  <script src="input-tools.js?v=7"></script>
+  <script src="settings.js?v=7"></script>
+  <script src="graph.js?v=7"></script>
   <!-- type="module" lets this file use import (needed for Firebase) -->
-  <script type="module" src="auth.js?v=6"></script>
+  <script type="module" src="auth.js?v=7"></script>
 </body>
 </html>
